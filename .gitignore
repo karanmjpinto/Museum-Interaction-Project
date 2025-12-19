@@ -22,6 +22,8 @@ uploads/
 outputs/
 *.txt
 *.md
+!README.md
+!CONCEPT_DESCRIPTION.md
 *.json
 !package.json
 !package-lock.json
