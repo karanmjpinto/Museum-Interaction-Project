@@ -1,7 +1,13 @@
 """Content generation service using Claude API"""
+import sys
+from pathlib import Path
+
+# Add project root to path
+project_root = Path(__file__).parent.parent.parent.parent
+sys.path.insert(0, str(project_root))
+
 import os
 import json
-from pathlib import Path
 from typing import List, Dict, Any
 import anthropic
 from backend.app.core.config import settings

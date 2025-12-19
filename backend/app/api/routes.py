@@ -1,7 +1,13 @@
 """API routes for the application"""
+import sys
+from pathlib import Path
+
+# Add project root to path
+project_root = Path(__file__).parent.parent.parent.parent
+sys.path.insert(0, str(project_root))
+
 import uuid
 import shutil
-from pathlib import Path
 from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
 from fastapi.responses import FileResponse
 from typing import List
@@ -248,29 +254,37 @@ async def download_file(job_id: str, file_type: str):
     Returns:
         File download
     """
-    if job_id not in jobs:
-        raise HTTPException(status_code=404, detail="Job not found")
-    
     # Determine file path based on type
     if file_type == "transcription":
         file_path = settings.OUTPUT_DIR / job_id / "transcription.txt"
+        media_type = "text/plain"
     elif file_type == "flashcards":
         file_path = settings.OUTPUT_DIR / job_id / "generated_content" / "flashcards.json"
+        media_type = "application/json"
     elif file_type == "infographics":
         file_path = settings.OUTPUT_DIR / job_id / "generated_content" / "infographic.md"
+        media_type = "text/markdown"
     elif file_type == "video_script":
         file_path = settings.OUTPUT_DIR / job_id / "generated_content" / "video_script.txt"
+        media_type = "text/plain"
     elif file_type == "podcast":
         file_path = settings.OUTPUT_DIR / job_id / "generated_content" / "podcast_script.txt"
+        media_type = "text/plain"
     else:
-        raise HTTPException(status_code=400, detail="Invalid file type")
+        raise HTTPException(status_code=400, detail=f"Invalid file type: {file_type}. Allowed: transcription, flashcards, infographics, video_script, podcast")
     
     if not file_path.exists():
-        raise HTTPException(status_code=404, detail="File not found")
+        raise HTTPException(
+            status_code=404, 
+            detail=f"File not found: {file_path.name}. The file may not have been generated yet."
+        )
     
     return FileResponse(
         path=str(file_path),
         filename=file_path.name,
-        media_type="application/octet-stream"
+        media_type=media_type,
+        headers={
+            "Content-Disposition": f'attachment; filename="{file_path.name}"'
+        }
     )
 
