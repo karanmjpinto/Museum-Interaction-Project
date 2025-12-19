@@ -24,6 +24,7 @@ outputs/
 *.md
 !README.md
 !CONCEPT_DESCRIPTION.md
+!BUSINESS_CASE.md
 *.json
 !package.json
 !package-lock.json
